@@ -15,15 +15,19 @@ R_table = [
 agent.position = [0, 1]
 
 epsilon = 0.3
-condition = False
-for i in range(100):
+for i in range(1000):
+    condition = False
     if epsilon > random.random():
         while(not condition):
             agent.position[0] = random.choice([agent.position[0] + 1, agent.position[0] - 1,
                                               agent.position[0]])
             agent.position[1] = random.choice([agent.position[1] + 1, agent.position[1] - 1,
                                               agent.position[1]])
-            condition_x = (agent.position[0] >= 0 and agent.position[0] <= 3)
-            condition_y = (agent.position[1] >= 0 and agent.position[1] <= 3)
+            special = not (agent.position[0] == 2 and agent.position[1] == 2)
+            condition_x = (agent.position[0] >= 0 and agent.position[0] <= 3) and special
+            condition_y = (agent.position[1] >= 0 and agent.position[1] <= 3) and special
             condition = condition_x and condition_y
-    print("Agent's position in the maze : ",agent.position)
+            if agent.position[0] == 3 and agent.position[1] == 3:
+                print("Agent solved the maze at", i, " steps")
+                break
+    print("Agent's position in the maze : ", agent.position)
