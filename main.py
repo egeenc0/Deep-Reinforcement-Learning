@@ -17,14 +17,16 @@ Q = np.zeros((4, 4, 4))  # 4x4 grid with 4 actions per state
 actions = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # up, down, left, right
 
 epsilon = 0.3
-learning_rate = 0.4
+learning_rate = 0.2
 gamma = 0.9
 
 def get_valid_actions(position):
     valid_actions = []
     for idx, (dx, dy) in enumerate(actions):
         new_x, new_y = position[0] + dx, position[1] + dy
-        if 0 <= new_x < 4 and 0 <= new_y < 4 and R_table[new_x][new_y] != -1:
+        if (0 <= new_x < 4) and (0 <= new_y < 4) and (R_table[new_x][new_y] != -1):
+            if new_y == -1:
+                print("?")
             valid_actions.append(idx)
     return valid_actions
 
@@ -36,13 +38,19 @@ def update_q(current_position, action, reward, new_position):
 def main():
     for i in range(1000):
         current_position = agent.position
+        valid_actions = get_valid_actions(current_position)
         if random.random() < epsilon:
             # Explore: choose a random action from the valid actions
-            valid_actions = get_valid_actions(current_position)
-            action = random.choice(valid_actions)
+            if len(valid_actions) > 0:
+                action = random.choice(valid_actions)
         else:
             # Exploit: choose the best action from Q-table
-            action = np.argmax(Q[current_position[0], current_position[1]])
+            q_values = [Q[current_position[0], current_position[1], action] for action in valid_actions]
+            max_q_value = max(q_values)
+
+            #Find the max
+            actions_with_max_q = [action for action, q in zip(valid_actions, q_values) if q == max_q_value]
+            action = random.choice(actions_with_max_q)
 
         # Perform the action
         new_x, new_y = current_position[0] + actions[action][0], current_position[1] + actions[action][1]
